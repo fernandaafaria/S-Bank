@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-// INTERFACE: janela, telas e botões. As regras ficam na classe
+// PROJETO COMPLETO EM UMA CLASSE SÓ: a lógica do banco (vetores e regras)
+// e a interface (janela, telas e botões).
 public class Main {
 
     // ---------- Cores do visual ----------
@@ -46,7 +47,7 @@ public class Main {
     static CardLayout layoutConteudo = new CardLayout();
     static JPanel conteudo = new JPanel(layoutConteudo);   // telas ao lado da barra lateral
 
-    static JButton btnOuro, btnEstudante;
+    static JButton btnCartao1, btnCartao2;
     static JPanel cartao;
     static JLabel lblCartaoNome, lblNumero, lblTentativa, lblPontos, lblErroLogin;
 
@@ -73,7 +74,10 @@ public class Main {
     //                 LÓGICA DO BANCO
     // =====================================================
 
-    static String[] cartoes = {"Ouro", "Estudante"};
+    // Número de cada cartão (aparece na tela e no verso do cartão impresso).
+    // A mesma posição = o mesmo cartão: numeros[0] usa senhas[0] e saldos[0].
+    static String[] numeros = {"0001", "0002"};
+    static final String NOME_CARTAO = "Cartão SBank";
     static String[] senhas = {"1234", "0000"};
     static double[] saldos = {1000.0, 200.0};
 
@@ -125,7 +129,7 @@ public class Main {
     static String gravarComprovante(int c, double saque, String usuario) throws IOException {
         String comprovante = "SENAI BANK - COMPROVANTE\n"
                 + "Cliente: " + usuario + "\n"
-                + "Cartão: " + cartoes[c] + "\n"
+                + "Cartão: " + numeros[c] + "\n"
                 + "Saque: " + reais(saque) + "\n"
                 + "Saldo atual: " + reais(saldos[c]);
 
@@ -190,12 +194,12 @@ public class Main {
         abas.setOpaque(false);
         abas.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
         abas.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnOuro = botao("Ouro", AZUL, BRANCO);
-        btnEstudante = botao("Estudante", BRANCO, TEXTO);
-        btnOuro.addActionListener(e -> escolherCartao(0));
-        btnEstudante.addActionListener(e -> escolherCartao(1));
-        abas.add(btnOuro);
-        abas.add(btnEstudante);
+        btnCartao1 = botao("Cartão " + numeros[0], AZUL, BRANCO);
+        btnCartao2 = botao("Cartão " + numeros[1], BRANCO, TEXTO);
+        btnCartao1.addActionListener(e -> escolherCartao(0));
+        btnCartao2.addActionListener(e -> escolherCartao(1));
+        abas.add(btnCartao1);
+        abas.add(btnCartao2);
         p.add(abas);
         p.add(espaco(12));
 
@@ -269,17 +273,12 @@ public class Main {
     }
 
     static void atualizarLogin() {
-        cores(btnOuro, c == 0 ? AZUL : BRANCO, c == 0 ? BRANCO : TEXTO);
-        cores(btnEstudante, c == 1 ? AZUL : BRANCO, c == 1 ? BRANCO : TEXTO);
-        if (c == 0) {
-            cartao.putClientProperty("cor1", new Color(0x6B, 0x4E, 0x00));
-            cartao.putClientProperty("cor2", new Color(0xB8, 0x90, 0x1A));
-        } else {
-            cartao.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));
-            cartao.putClientProperty("cor2", new Color(0x25, 0x63, 0xEB));
-        }
-        lblCartaoNome.setText(cartoes[c]);
-        lblNumero.setText("•••• •••• •••• 000" + (c + 1));
+        cores(btnCartao1, c == 0 ? AZUL : BRANCO, c == 0 ? BRANCO : TEXTO);
+        cores(btnCartao2, c == 1 ? AZUL : BRANCO, c == 1 ? BRANCO : TEXTO);
+        cartao.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));   // azul do cartão SBank
+        cartao.putClientProperty("cor2", new Color(0x25, 0x63, 0xEB));
+        lblCartaoNome.setText(NOME_CARTAO);
+        lblNumero.setText("•••• •••• •••• " + numeros[c]);
         lblTentativa.setText("Tentativa " + tentativa + " de 3");
         int n = pin.length();
         lblPontos.setText("● ".repeat(n) + "○ ".repeat(4 - n));
@@ -675,22 +674,17 @@ public class Main {
 
     static void abrirMenu(String mensagem) {
         lblOla.setText("Olá, " + usuario);
-        lblSaldoTitulo.setText("Saldo disponível · Cartão " + cartoes[c]);
+        lblSaldoTitulo.setText("Saldo disponível · Cartão " + numeros[c]);
         atualizarSaldoTela();
         atualizarListaMovimentacoes();
         lblMsgMenu.setText(mensagem.isEmpty() ? " " : mensagem);
         lblAvatar.setText(usuario.substring(0, 1).toUpperCase());
-        lblHomeCartao.setText(cartoes[c]);
-        lblHomeNumero.setText("•••• •••• •••• 000" + (c + 1));
+        lblHomeCartao.setText(NOME_CARTAO);
+        lblHomeNumero.setText("•••• •••• •••• " + numeros[c]);
         lblPerfilNome.setText(usuario);
-        lblPerfilCartao.setText("Cartão " + cartoes[c]);
-        if (c == 0) {
-            cartaoHome.putClientProperty("cor1", new Color(0x6B, 0x4E, 0x00));
-            cartaoHome.putClientProperty("cor2", new Color(0xB8, 0x90, 0x1A));
-        } else {
-            cartaoHome.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));
-            cartaoHome.putClientProperty("cor2", new Color(0x25, 0x63, 0xEB));
-        }
+        lblPerfilCartao.setText("Cartão " + numeros[c]);
+        cartaoHome.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));   // azul do cartão SBank
+        cartaoHome.putClientProperty("cor2", new Color(0x25, 0x63, 0xEB));
         cartaoHome.repaint();
         mostrar("menu");
     }
