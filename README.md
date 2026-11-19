@@ -13,7 +13,7 @@ O **S-Bank** é um simulador de caixa eletrônico desenvolvido em **Java (Swing/
 
 O projeto surgiu durante as aulas de **LOPAL (Lógica de Programação e Algoritmos)** a partir de uma provocação simples: **como funcionam as coisas que usamos todos os dias?**
 
-Quando vamos a um caixa eletrônico sacar dinheiro ou conferir o saldo, a operação parece instantânea. Porém, por trás de cada toque na tela existe uma sequência lógica de passos rigorosa — laços de repetição, estruturas condicionais, contagem de tentativas e validação de saldo.
+Quando vamos a um caixa eletrônico sacar dinheiro ou conferir o saldo, a operação parece instantânea.Porém, por trás de cada toque na tela existe uma sequência lógica de passos rigorosa — laços de repetição, estruturas condicionais, contagem de tentativas e validação de saldo.
 
 * **Versão 1.0 (Núcleo LOPAL — Console):** Desenvolvida 100% no terminal utilizando `Scanner`, laço `do-while` e uma variável `saldo = 0.0` dentro do método `main`.
 * **Versão 2.0 (S-Bank Atual — Desktop & Protótipo Web):** Evolução do mesmo núcleo de regras de negócio para uma interface gráfica moderna em Java Swing, adicionando múltiplos cartões via vetores paralelos, autenticação por PIN de 4 dígitos, histórico de movimentações, emissão de comprovante em `.txt` e um protótipo web interativo.
