@@ -104,7 +104,7 @@ public class Main {
     /** Senhas de 4 dígitos correspondentes a cada cartão do vetor {@code numeros}. */
     static String[] senhas = {"1234", "0000"};
     /** Saldos iniciais em reais correspondentes a cada cartão do vetor {@code numeros}. */
-    static double[] saldos = {1000.0, 200.0};
+    static double[] saldos = {1000.0, 350.0};
 
     /**
      * Verifica se a senha digitada coincide com a senha cadastrada para o cartão ativo.
