@@ -56,7 +56,7 @@ O sistema relaciona os dados de cada conta através do índice ativo `c` (`0` ou
 ```java
 static String[] numeros = {"0001", "0002"};
 static String[] senhas  = {"1234", "0000"};
-static double[] saldos  = {1000.0, 200.0};
+static double[] saldos  = {1000.0, 350.0};
 
 7. Equipe de Desenvolvimento
 - Carlos
