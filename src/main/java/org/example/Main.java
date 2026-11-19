@@ -14,38 +14,61 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-// PROJETO COMPLETO EM UMA CLASSE SÓ: a lógica do banco (vetores e regras)
-// e a interface (janela, telas e botões).
+/**
+ * Classe principal do sistema <strong>S-Bank</strong> (Simulador de Terminal de Autoatendimento Bancário).
+ * Centraliza tanto a lógica de negócios (autenticação via PIN, controle de tentativas, consulta de saldo,
+ * depósitos, saques, histórico de movimentações e geração de comprovante em arquivo) quanto toda a
+ * interface gráfica desenvolvida em Java Swing e AWT.
+ *
+ * @author Fernanda Faria, Carlos e Julia
+ * @version 1.0
+ */
 public class Main {
 
-    // ---------- Cores do visual ----------
+    // ---------- Paleta de cores do visual ----------
+    /** Cor de fundo principal das telas. */
     static final Color FUNDO = new Color(0xEE, 0xF2, 0xF9);
+    /** Azul institucional principal da marca S-Bank. */
     static final Color AZUL = new Color(0x1D, 0x4E, 0xD8);
+    /** Azul claro utilizado em destaques, chips e abas ativas. */
     static final Color AZUL_CLARO = new Color(0xE4, 0xEC, 0xFC);
+    /** Cor padrão para textos de alto contraste. */
     static final Color TEXTO = new Color(0x14, 0x21, 0x3D);
+    /** Cor neutra para subtítulos e rótulos secundários. */
     static final Color CINZA = new Color(0x5B, 0x64, 0x78);
+    /** Cor das bordas suaves de cartões e campos de entrada. */
     static final Color BORDA = new Color(0xDB, 0xE2, 0xEF);
+    /** Verde semântico para confirmações e entradas de valores. */
     static final Color VERDE = new Color(0x16, 0xA3, 0x4A);
+    /** Vermelho semântico para alertas, erros e saídas de valores. */
     static final Color VERMELHO = new Color(0xDC, 0x26, 0x26);
+    /** Branco puro para superfícies e textos sobre fundos escuros. */
     static final Color BRANCO = Color.WHITE;
 
     // ---------- Estado do atendimento ----------
-    static int c = 0;               // posição do cartão nos vetores
-    static int tentativa = 1;       // tentativa de senha (1 a 3)
-    static String pin = "";         // dígitos digitados
+    /** Índice do cartão atualmente selecionado nos vetores paralelos (0 ou 1). */
+    static int c = 0;
+    /** Contador de tentativas de autenticação do usuário (limite de 3 tentativas). */
+    static int tentativa = 1;
+    /** Sequência de dígitos do PIN informados no teclado virtual. */
+    static String pin = "";
+    /** Define se a tela de operação financeira está em modo Saque ({@code true}) ou Depósito ({@code false}). */
     static boolean modoSaque = true;
+    /** Armazena o valor do último saque efetuado para impressão no comprovante. */
     static double ultimoSaque = 0;
-    static String usuario = "Cliente";   // nome digitado na tela de login
+    /** Nome de exibição do cliente na sessão atual. */
+    static String usuario = "Cliente";
 
-    // Histórico de movimentações em memória (formato: "cartaoIndex;tipo;valor;dataHora")
+    /** Histórico de movimentações em memória no formato {@code "cartaoIndex;tipo;valor;dataHora"}. */
     static ArrayList<String> movimentacoes = new ArrayList<>();
+    /** Formatador padrão de data e hora para o extrato de movimentações. */
     static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // ---------- Telas e componentes que mudam ----------
+    // ---------- Telas e componentes dinâmicos da interface ----------
     static CardLayout layout = new CardLayout();
     static JPanel telas = new JPanel(layout);
     static CardLayout layoutConteudo = new CardLayout();
-    static JPanel conteudo = new JPanel(layoutConteudo);   // telas ao lado da barra lateral
+    static JPanel conteudo = new JPanel(layoutConteudo);
 
     static JButton btnCartao1, btnCartao2;
     static JPanel cartao;
@@ -74,17 +97,33 @@ public class Main {
     //                 LÓGICA DO BANCO
     // =====================================================
 
-    // Número de cada cartão (aparece na tela e no verso do cartão impresso).
-    // A mesma posição = o mesmo cartão: numeros[0] usa senhas[0] e saldos[0].
+    /** Números finais dos cartões cadastrados no sistema (vetores paralelos por índice). */
     static String[] numeros = {"0001", "0002"};
-    static final String NOME_CARTAO = "Cartão SBank";
+    /** Nome institucional exibido na face dos cartões. */
+    static final String NOME_CARTAO = "Cartão S-Bank";
+    /** Senhas de 4 dígitos correspondentes a cada cartão do vetor {@code numeros}. */
     static String[] senhas = {"1234", "0000"};
+    /** Saldos iniciais em reais correspondentes a cada cartão do vetor {@code numeros}. */
     static double[] saldos = {1000.0, 200.0};
 
+    /**
+     * Verifica se a senha digitada coincide com a senha cadastrada para o cartão ativo.
+     *
+     * @param c        Índice do cartão selecionado nos vetores.
+     * @param digitada Senha de 4 dígitos inserida pelo usuário.
+     * @return {@code true} se a senha estiver correta; {@code false} caso contrário.
+     */
     static boolean senhaCorreta(int c, String digitada) {
         return digitada.equals(senhas[c]);
     }
 
+    /**
+     * Converte o texto digitado pelo usuário em um valor numérico válido,
+     * aceitando vírgula ou ponto como separador decimal.
+     *
+     * @param texto Texto bruto obtido do campo de valor.
+     * @return Valor numérico convertido, ou {@code 0} caso a entrada seja inválida.
+     */
     static double lerValor(String texto) {
         try {
             double valor = Double.parseDouble(texto.trim().replace(",", "."));
@@ -97,11 +136,25 @@ public class Main {
         }
     }
 
+    /**
+     * Registra uma nova transação financeira no histórico em memória com data e hora atuais.
+     *
+     * @param cartaoIdx Índice do cartão que realizou a operação.
+     * @param tipo      Descrição da operação ({@code "Depósito"} ou {@code "Saque"}).
+     * @param valor     Valor monetário movimentado.
+     */
     static void registrarMovimentacao(int cartaoIdx, String tipo, double valor) {
         String agora = LocalDateTime.now().format(FORMATO_DATA);
         movimentacoes.add(cartaoIdx + ";" + tipo + ";" + reais(valor) + ";" + agora);
     }
 
+    /**
+     * Efetua o depósito de um valor positivo na conta do cartão selecionado.
+     *
+     * @param c     Índice do cartão de destino.
+     * @param valor Quantia em reais a ser creditada.
+     * @return String vazia em caso de sucesso, ou mensagem de erro caso o valor seja inválido.
+     */
     static String depositar(int c, double valor) {
         if (valor > 0) {
             saldos[c] += valor;
@@ -111,6 +164,14 @@ public class Main {
         return "Erro: Valor inválido.";
     }
 
+    /**
+     * Efetua o saque de um valor na conta do cartão selecionado após validar
+     * a disponibilidade de saldo e a positividade do valor.
+     *
+     * @param c     Índice do cartão de origem.
+     * @param valor Quantia em reais a ser debitada.
+     * @return String vazia em caso de sucesso, ou mensagem de erro específica.
+     */
     static String sacar(int c, double valor) {
         if (valor > saldos[c]) {
             return "Erro: Saldo insuficiente.";
@@ -122,22 +183,38 @@ public class Main {
         return "";
     }
 
+    /**
+     * Formata um número decimal no padrão monetário brasileiro (Real).
+     *
+     * @param valor Quantia numérica a ser formatada.
+     * @return String formatada no padrão {@code "R$ 0,00"}.
+     */
     static String reais(double valor) {
         return String.format("R$ %.2f", valor);
     }
 
+    /**
+     * Grava o comprovante do saque no arquivo local {@code comprovante_sbank.txt}
+     * e realiza a leitura do arquivo para retornar seu conteúdo exato.
+     *
+     * @param c       Índice do cartão utilizado na operação.
+     * @param saque   Valor do saque realizado.
+     * @param usuario Nome do cliente autenticado na sessão.
+     * @return Conteúdo textual completo lido do arquivo gerado.
+     * @throws IOException Caso ocorra falha de escrita ou leitura no sistema de arquivos.
+     */
     static String gravarComprovante(int c, double saque, String usuario) throws IOException {
-        String comprovante = "SENAI BANK - COMPROVANTE\n"
+        String comprovante = "S-BANK - COMPROVANTE\n"
                 + "Cliente: " + usuario + "\n"
                 + "Cartão: " + numeros[c] + "\n"
                 + "Saque: " + reais(saque) + "\n"
                 + "Saldo atual: " + reais(saldos[c]);
 
-        FileWriter arquivo = new FileWriter("comprovante_senai_bank.txt");
+        FileWriter arquivo = new FileWriter("comprovante_sbank.txt");
         arquivo.write(comprovante);
         arquivo.close();
 
-        BufferedReader leitor = new BufferedReader(new FileReader("comprovante_senai_bank.txt"));
+        BufferedReader leitor = new BufferedReader(new FileReader("comprovante_sbank.txt"));
         String conteudo = "";
         String linha = leitor.readLine();
         while (linha != null) {
@@ -151,6 +228,11 @@ public class Main {
     // =====================================================
     //                 INTERFACE (JANELA)
     // =====================================================
+
+    /**
+     * Instancia e organiza todas as telas principais e subtelas internas
+     * dentro dos gerenciadores {@link CardLayout}.
+     */
     static void montarTelas() {
         telas.setBackground(FUNDO);
         conteudo.setBackground(FUNDO);
@@ -160,7 +242,7 @@ public class Main {
         conteudo.add(centralizar(criarRecibo(), 440, 600), "recibo");
         conteudo.add(criarTelaHistorico(), "historico");
 
-        JPanel app = new JPanel(new BorderLayout());   // barra lateral + conteúdo
+        JPanel app = new JPanel(new BorderLayout());
         app.add(criarSidebar(), BorderLayout.WEST);
         app.add(conteudo, BorderLayout.CENTER);
 
@@ -169,14 +251,20 @@ public class Main {
         telas.add(centralizar(criarBloqueio(), 400, 420), "bloq");
     }
 
+    /**
+     * Ponto de entrada da aplicação S-Bank. Inicializa a janela principal
+     * maximizada na thread de despacho de eventos do Swing.
+     *
+     * @param args Argumentos de linha de comando (não utilizados).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame janela = new JFrame("Senai Bank");
+            JFrame janela = new JFrame("S-Bank");
             montarTelas();
 
             janela.add(telas);
             janela.setSize(1200, 820);
-            janela.setExtendedState(JFrame.MAXIMIZED_BOTH); // Abre em tela inteira
+            janela.setExtendedState(JFrame.MAXIMIZED_BOTH);
             janela.setLocationRelativeTo(null);
             janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             atualizarLogin();
@@ -185,6 +273,13 @@ public class Main {
     }
 
     // =============== TELA 1: LOGIN ===============
+
+    /**
+     * Constrói o painel da tela de autenticação com seleção de cartão,
+     * campo opcional de nome e teclado numérico virtual.
+     *
+     * @return Painel configurado da tela de login.
+     */
     static JPanel criarLogin() {
         JPanel p = tela();
         p.add(topo());
@@ -209,7 +304,7 @@ public class Main {
         cartao.setPreferredSize(new Dimension(340, 150));
         cartao.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
         cartao.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel marca = new JLabel("SENAI BANK");
+        JLabel marca = new JLabel("S-BANK");
         marca.setFont(new Font("SansSerif", Font.BOLD, 16));
         marca.setForeground(BRANCO);
         lblCartaoNome = new JLabel();
@@ -264,6 +359,11 @@ public class Main {
         return p;
     }
 
+    /**
+     * Alterna o cartão ativo na tela de login e reinicia as tentativas e o PIN.
+     *
+     * @param i Índice do cartão escolhido (0 ou 1).
+     */
     static void escolherCartao(int i) {
         c = i;
         tentativa = 1;
@@ -272,10 +372,14 @@ public class Main {
         lblErroLogin.setText(" ");
     }
 
+    /**
+     * Atualiza visualmente os elementos da tela de login conforme o cartão selecionado,
+     * o número de tentativas e a quantidade de dígitos inseridos.
+     */
     static void atualizarLogin() {
         cores(btnCartao1, c == 0 ? AZUL : BRANCO, c == 0 ? BRANCO : TEXTO);
         cores(btnCartao2, c == 1 ? AZUL : BRANCO, c == 1 ? BRANCO : TEXTO);
-        cartao.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));   // azul do cartão SBank
+        cartao.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));
         cartao.putClientProperty("cor2", new Color(0x25, 0x63, 0xEB));
         lblCartaoNome.setText(NOME_CARTAO);
         lblNumero.setText("•••• •••• •••• " + numeros[c]);
@@ -286,6 +390,12 @@ public class Main {
         cartao.repaint();
     }
 
+    /**
+     * Processa a entrada de um dígito ou backspace no teclado virtual do login.
+     * Ao completar 4 dígitos, realiza a autenticação ou bloqueia o acesso após 3 falhas.
+     *
+     * @param t Caractere da tecla pressionada ({@code "0"-"9"} ou {@code "←"}).
+     */
     static void digitar(String t) {
         if (t.equals("←")) {
             if (pin.length() > 0) {
@@ -321,13 +431,19 @@ public class Main {
         }
     }
 
-    // =============== TELA 2: INÍCIO (expandida + movimentações) ===============
+    // =============== TELA 2: INÍCIO ===============
+
+    /**
+     * Constrói o painel principal (Dashboard) exibido após o login, contendo
+     * saudação, cartão de saldo com opção de ocultar, atalhos e últimas movimentações.
+     *
+     * @return Painel configurado da tela inicial.
+     */
     static JPanel criarInicio() {
         JPanel p = new JPanel(new BorderLayout(0, 22));
         p.setBackground(FUNDO);
         p.setBorder(new EmptyBorder(32, 42, 32, 42));
 
-        // ----- Parte de cima: saudação e saldo (esquerda) | avatar e cartão (direita)
         JPanel cab = new JPanel(new BorderLayout());
         cab.setOpaque(false);
 
@@ -398,7 +514,7 @@ public class Main {
         cartaoHome.setBorder(new EmptyBorder(16, 20, 16, 20));
         cartaoHome.setPreferredSize(new Dimension(320, 160));
         cartaoHome.setMaximumSize(new Dimension(320, 160));
-        JLabel marca = new JLabel("SENAI BANK");
+        JLabel marca = new JLabel("S-BANK");
         marca.setFont(new Font("SansSerif", Font.BOLD, 15));
         marca.setForeground(BRANCO);
         lblHomeCartao = new JLabel();
@@ -414,11 +530,9 @@ public class Main {
         cab.add(dir, BorderLayout.EAST);
         p.add(cab, BorderLayout.NORTH);
 
-        // ----- Parte central: Operações essenciais (4 cartões expandidos) + Movimentações
         JPanel corpo = new JPanel(new BorderLayout(0, 22));
         corpo.setOpaque(false);
 
-        // Bloco de operações
         JPanel blocoOp = new JPanel(new BorderLayout(0, 14));
         blocoOp.setOpaque(false);
         JPanel tituloMeio = new JPanel(new BorderLayout(0, 14));
@@ -432,7 +546,6 @@ public class Main {
         tituloMeio.add(titulo, BorderLayout.CENTER);
         blocoOp.add(tituloMeio, BorderLayout.NORTH);
 
-        // Grade em 1 linha de 4 colunas ou 2x2 ocupando toda a largura
         JPanel grade = new JPanel(new GridLayout(1, 4, 18, 0));
         grade.setOpaque(false);
         grade.setPreferredSize(new Dimension(0, 115));
@@ -448,7 +561,6 @@ public class Main {
 
         corpo.add(blocoOp, BorderLayout.NORTH);
 
-        // Bloco de movimentações recentes (preenche o restante da tela)
         JPanel blocoMov = new JPanel(new BorderLayout(0, 12));
         blocoMov.setOpaque(false);
 
@@ -497,6 +609,13 @@ public class Main {
     }
 
     // =============== TELA DE EXTRATO / MOVIMENTAÇÕES COMPLETAS ===============
+
+    /**
+     * Constrói a tela dedicada à visualização do extrato completo de movimentações
+     * do cartão ativo.
+     *
+     * @return Painel configurado do histórico completo.
+     */
     static JPanel criarTelaHistorico() {
         JPanel p = new JPanel(new BorderLayout(0, 18));
         p.setBackground(FUNDO);
@@ -537,11 +656,18 @@ public class Main {
         return p;
     }
 
+    /**
+     * Atualiza os dados do extrato e navega para a tela de histórico completo.
+     */
     static void abrirHistorico() {
         atualizarListaMovimentacoes();
         mostrar("historico");
     }
 
+    /**
+     * Filtra as movimentações pertencentes ao cartão ativo e atualiza tanto
+     * o resumo do painel principal quanto a lista completa do extrato.
+     */
     static void atualizarListaMovimentacoes() {
         StringBuilder sbHome = new StringBuilder();
         StringBuilder sbCompleto = new StringBuilder();
@@ -578,7 +704,12 @@ public class Main {
         }
     }
 
-    // Barra lateral: logo, 5 itens de menu, perfil e botão Encerrar
+    /**
+     * Constrói a barra lateral de navegação fixa com identidade da marca,
+     * links de acesso rápido, perfil do usuário e botão de encerramento.
+     *
+     * @return Painel da barra lateral esquerda.
+     */
     static JPanel criarSidebar() {
         JPanel s = new JPanel();
         s.setLayout(new BoxLayout(s, BoxLayout.Y_AXIS));
@@ -598,7 +729,7 @@ public class Main {
         letra.setFont(new Font("SansSerif", Font.BOLD, 18));
         letra.setForeground(BRANCO);
         quadrado.add(letra);
-        JLabel nomeBanco = new JLabel("SENAI BANK");
+        JLabel nomeBanco = new JLabel("S-BANK");
         nomeBanco.setFont(new Font("SansSerif", Font.BOLD, 16));
         nomeBanco.setForeground(AZUL);
         logo.add(quadrado);
@@ -655,11 +786,18 @@ public class Main {
         return s;
     }
 
+    /**
+     * Exibe uma caixa de diálogo informando o saldo atual do cartão ativo.
+     */
     static void consultarSaldo() {
         JOptionPane.showMessageDialog(null, "Seu saldo é: " + reais(saldos[c]),
-                "Saldo", JOptionPane.INFORMATION_MESSAGE);
+                "Saldo S-Bank", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Finaliza a sessão do usuário atual, limpa os campos de identificação
+     * e retorna à tela inicial de login.
+     */
     static void encerrar() {
         JOptionPane.showMessageDialog(null, usuario + ", atendimento encerrado com sucesso!");
         txtNome.setText("");
@@ -667,11 +805,19 @@ public class Main {
         mostrar("login");
     }
 
+    /**
+     * Alterna a exibição do saldo entre o valor monetário formatado e a máscara de privacidade.
+     */
     static void atualizarSaldoTela() {
         lblSaldoMenu.setText(ocultarSaldo ? "R$ ••••••" : reais(saldos[c]));
         btnOcultar.setText(ocultarSaldo ? "Mostrar" : "Ocultar");
     }
 
+    /**
+     * Prepara os dados do cliente, saldo, cartão e histórico e exibe o painel principal.
+     *
+     * @param mensagem Mensagem de feedback opcional exibida abaixo do cartão de saldo.
+     */
     static void abrirMenu(String mensagem) {
         lblOla.setText("Olá, " + usuario);
         lblSaldoTitulo.setText("Saldo disponível · Cartão " + numeros[c]);
@@ -683,12 +829,17 @@ public class Main {
         lblHomeNumero.setText("•••• •••• •••• " + numeros[c]);
         lblPerfilNome.setText(usuario);
         lblPerfilCartao.setText("Cartão " + numeros[c]);
-        cartaoHome.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));   // azul do cartão SBank
+        cartaoHome.putClientProperty("cor1", new Color(0x0B, 0x3A, 0x9E));
         cartaoHome.putClientProperty("cor2", new Color(0x25, 0x63, 0xEB));
         cartaoHome.repaint();
         mostrar("menu");
     }
 
+    /**
+     * Gerencia a navegação entre as telas principais e subtelas do aplicativo.
+     *
+     * @param nome Identificador da tela de destino no {@link CardLayout}.
+     */
     static void mostrar(String nome) {
         if (nome.equals("menu") || nome.equals("valor") || nome.equals("conf")
                 || nome.equals("recibo") || nome.equals("historico")) {
@@ -700,6 +851,11 @@ public class Main {
         }
     }
 
+    /**
+     * Destaca visualmente o item selecionado no menu lateral conforme a tela ativa.
+     *
+     * @param nome Identificador da subtela atualmente visível.
+     */
     static void atualizarNav(String nome) {
         boolean inicio = nome.equals("menu");
         boolean deposito = nome.equals("valor") && !modoSaque;
@@ -711,6 +867,14 @@ public class Main {
         cores(btnNavHist, hist ? AZUL_CLARO : BRANCO, hist ? AZUL : TEXTO);
     }
 
+    /**
+     * Envolve um painel interno em um contêiner centralizado com dimensões fixas.
+     *
+     * @param tela    Painel interno a ser centralizado.
+     * @param largura Largura preferencial em pixels.
+     * @param altura  Altura preferencial em pixels.
+     * @return Painel externo com alinhamento central.
+     */
     static JPanel centralizar(JPanel tela, int largura, int altura) {
         tela.setPreferredSize(new Dimension(largura, altura));
         JPanel fora = new JPanel(new GridBagLayout());
@@ -719,12 +883,25 @@ public class Main {
         return fora;
     }
 
+    /**
+     * Alinha um componente {@link JLabel} à esquerda dentro de layouts em coluna.
+     *
+     * @param l Rótulo a ser alinhado.
+     * @return O próprio rótulo com alinhamento esquerdo configurado.
+     */
     static JLabel esquerda(JLabel l) {
         l.setAlignmentX(Component.LEFT_ALIGNMENT);
         return l;
     }
 
     // =============== TELA 3: SAQUE / DEPÓSITO ===============
+
+    /**
+     * Constrói a tela unificada de operações financeiras (Saque e Depósito),
+     * incluindo abas de alternância, campo numérico e botões de valores rápidos.
+     *
+     * @return Painel configurado da tela de operação.
+     */
     static JPanel criarOperacao() {
         JPanel p = tela();
         p.add(espaco(4));
@@ -782,6 +959,11 @@ public class Main {
         return p;
     }
 
+    /**
+     * Cria a linha de botões de preenchimento rápido de valores (50, 100, 200, 500).
+     *
+     * @return Painel contendo os 4 botões de atalho.
+     */
     static JPanel chipsOperacao() {
         JPanel linha = new JPanel(new GridLayout(1, 4, 8, 0));
         linha.setOpaque(false);
@@ -796,6 +978,12 @@ public class Main {
         return linha;
     }
 
+    /**
+     * Configura e exibe a tela de operação financeira no modo desejado.
+     *
+     * @param saque {@code true} para modo Saque; {@code false} para modo Depósito.
+     * @param valor Valor inicial a ser exibido no campo de texto.
+     */
     static void abrirOperacao(boolean saque, String valor) {
         modoSaque = saque;
         txtValor.setText(valor);
@@ -809,6 +997,10 @@ public class Main {
         txtValor.requestFocusInWindow();
     }
 
+    /**
+     * Valida e executa a operação de saque ou depósito informada pelo usuário,
+     * redirecionando para a tela de confirmação ou retornando ao menu com sucesso.
+     */
     static void confirmar() {
         double valor = lerValor(txtValor.getText());
         String erro = modoSaque ? sacar(c, valor) : depositar(c, valor);
@@ -828,6 +1020,13 @@ public class Main {
     }
 
     // =============== TELA 4: SAQUE CONCLUÍDO ===============
+
+    /**
+     * Constrói a tela de confirmação exibida imediatamente após um saque bem-sucedido,
+     * oferecendo a opção de gerar ou dispensar o comprovante.
+     *
+     * @return Painel configurado da tela de confirmação.
+     */
     static JPanel criarConfirmacao() {
         JPanel p = tela();
         p.add(espaco(4));
@@ -868,6 +1067,9 @@ public class Main {
         return p;
     }
 
+    /**
+     * Aciona a gravação do comprovante em arquivo e exibe seu conteúdo na tela de recibo.
+     */
     static void pedirComprovante() {
         try {
             areaRecibo.setText(gravarComprovante(c, ultimoSaque, usuario));
@@ -879,6 +1081,13 @@ public class Main {
     }
 
     // =============== TELA 5: COMPROVANTE ===============
+
+    /**
+     * Constrói a tela que exibe o conteúdo do comprovante gerado e informa
+     * o nome do arquivo salvo localmente.
+     *
+     * @return Painel configurado da tela de recibo.
+     */
     static JPanel criarRecibo() {
         JPanel p = tela();
         p.add(espaco(4));
@@ -897,7 +1106,7 @@ public class Main {
         areaRecibo.setAlignmentX(Component.CENTER_ALIGNMENT);
         p.add(areaRecibo);
         p.add(espaco(10));
-        p.add(rot("Arquivo salvo: comprovante_senai_bank.txt", 13, Font.PLAIN, CINZA));
+        p.add(rot("Arquivo salvo: comprovante_sbank.txt", 13, Font.PLAIN, CINZA));
         p.add(espaco(18));
 
         JButton voltar = botao("Voltar ao painel", AZUL, BRANCO);
@@ -909,6 +1118,13 @@ public class Main {
     }
 
     // =============== TELA 6: ACESSO NEGADO ===============
+
+    /**
+     * Constrói a tela de bloqueio exibida quando o usuário excede o limite
+     * de 3 tentativas incorretas de senha.
+     *
+     * @return Painel configurado da tela de acesso negado.
+     */
     static JPanel criarBloqueio() {
         JPanel p = tela();
         p.add(topo());
@@ -933,6 +1149,16 @@ public class Main {
     }
 
     // =============== PEÇAS REUTILIZÁVEIS ===============
+
+    /**
+     * Cria um componente {@link JLabel} estilizado e centralizado.
+     *
+     * @param texto   Conteúdo textual do rótulo.
+     * @param tamanho Tamanho da fonte em pontos.
+     * @param estilo  Estilo da fonte (ex.: {@link Font#BOLD}, {@link Font#PLAIN}).
+     * @param cor     Cor do texto.
+     * @return Rótulo configurado.
+     */
     static JLabel rot(String texto, int tamanho, int estilo, Color cor) {
         JLabel l = new JLabel(texto);
         l.setFont(new Font("SansSerif", estilo, tamanho));
@@ -941,6 +1167,11 @@ public class Main {
         return l;
     }
 
+    /**
+     * Cria um painel base vertical com espaçamento interno e cor de fundo padrão.
+     *
+     * @return Painel base configurado.
+     */
     static JPanel tela() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -949,14 +1180,32 @@ public class Main {
         return p;
     }
 
+    /**
+     * Cria um espaçador vertical rígido.
+     *
+     * @param altura Altura do espaço em pixels.
+     * @return Componente espaçador.
+     */
     static Component espaco(int altura) {
         return Box.createRigidArea(new Dimension(0, altura));
     }
 
+    /**
+     * Cria o cabeçalho institucional padrão com o nome da marca S-BANK.
+     *
+     * @return Rótulo do topo da tela.
+     */
     static JLabel topo() {
-        return rot("SENAI BANK", 16, Font.BOLD, AZUL);
+        return rot("S-BANK", 16, Font.BOLD, AZUL);
     }
 
+    /**
+     * Cria uma linha horizontal de resumo com descrição à esquerda e valor em destaque à direita.
+     *
+     * @param nome  Descrição do campo.
+     * @param valor Rótulo contendo o valor formatado.
+     * @return Painel horizontal configurado.
+     */
     static JPanel linha(String nome, JLabel valor) {
         valor.setFont(new Font("SansSerif", Font.BOLD, 14));
         JLabel n = new JLabel(nome);
@@ -970,6 +1219,13 @@ public class Main {
         return l;
     }
 
+    /**
+     * Cria um ícone circular sólido com um símbolo centralizado.
+     *
+     * @param sinal Símbolo ou caractere central (ex.: {@code "✓"} ou {@code "!"}).
+     * @param cor   Cor de preenchimento do círculo.
+     * @return Painel circular configurado.
+     */
     static JPanel circulo(String sinal, Color cor) {
         JPanel a = arredondado(cor, cor, 64);
         a.setLayout(new GridBagLayout());
@@ -983,6 +1239,14 @@ public class Main {
         return a;
     }
 
+    /**
+     * Cria um botão customizado com cantos arredondados via {@link Graphics2D}.
+     *
+     * @param texto    Texto exibido no botão.
+     * @param fundo    Cor de preenchimento do botão.
+     * @param corTexto Cor do texto do botão.
+     * @return Botão estilizado.
+     */
     static JButton botao(String texto, Color fundo, Color corTexto) {
         JButton b = new JButton(texto) {
             @Override
@@ -1007,12 +1271,27 @@ public class Main {
         return b;
     }
 
+    /**
+     * Atualiza dinamicamente as cores de fundo e texto de um botão customizado.
+     *
+     * @param b        Botão a ser atualizado.
+     * @param fundo    Nova cor de fundo.
+     * @param corTexto Nova cor de texto.
+     */
     static void cores(JButton b, Color fundo, Color corTexto) {
         b.putClientProperty("fundo", fundo);
         b.setForeground(corTexto);
         b.repaint();
     }
 
+    /**
+     * Cria um painel com cantos arredondados, suporte a gradiente linear e sombra opcional.
+     *
+     * @param cor1 Cor inicial do gradiente.
+     * @param cor2 Cor final do gradiente.
+     * @param arco Raio de arredondamento dos cantos em pixels.
+     * @return Painel customizado.
+     */
     static JPanel arredondado(Color cor1, Color cor2, int arco) {
         JPanel p = new JPanel() {
             @Override
@@ -1045,6 +1324,14 @@ public class Main {
         return p;
     }
 
+    /**
+     * Desenha vetorialmente os ícones das operações essenciais (saldo, depósito, saque e encerrar).
+     *
+     * @param tipo  Identificador do ícone ({@code "saldo"}, {@code "deposito"}, {@code "saque"} ou {@code "encerrar"}).
+     * @param cor   Cor do traço do ícone.
+     * @param fundo Cor do círculo de fundo do ícone.
+     * @return Painel contendo o ícone desenhado.
+     */
     static JPanel icone(String tipo, Color cor, Color fundo) {
         JPanel p = new JPanel() {
             @Override
@@ -1079,6 +1366,18 @@ public class Main {
         return p;
     }
 
+    /**
+     * Cria um cartão interativo (tile) para as operações rápidas do painel principal,
+     * com efeito de destaque ao passar o mouse.
+     *
+     * @param tipo       Tipo de ícone vetorial exibido à esquerda.
+     * @param titulo     Título principal da ação.
+     * @param subtitulo  Descrição curta da ação.
+     * @param corIcone   Cor principal do ícone.
+     * @param fundoIcone Cor de fundo circular do ícone.
+     * @param acao       Ação executada ao clicar no cartão.
+     * @return Painel interativo configurado.
+     */
     static JPanel tile(String tipo, String titulo, String subtitulo, Color corIcone, Color fundoIcone, Runnable acao) {
         JPanel t = arredondado(BRANCO, BRANCO, 22);
         t.putClientProperty("sombra", true);
@@ -1132,6 +1431,12 @@ public class Main {
         return t;
     }
 
+    /**
+     * Envolve um rótulo em um painel alinhado à esquerda para uso na barra lateral.
+     *
+     * @param l Rótulo a ser alinhado.
+     * @return Painel com alinhamento esquerdo.
+     */
     static JPanel linhaEsquerda(JLabel l) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         p.setOpaque(false);
