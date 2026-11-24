@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Senai Bank | Autoatendimento Digital</title>
+    <title>S-Bank | Autoatendimento Digital</title>
     <style>
         :root {
             --fundo: #EEF2F9;
@@ -40,6 +40,78 @@
 
         .hidden {
             display: none !important;
+        }
+
+        /* ================= BARRA DE ACESSIBILIDADE ================= */
+        .a11y-bar {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 9999;
+            display: flex;
+            gap: 6px;
+            background: var(--branco);
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--borda);
+            box-shadow: 0 4px 12px rgba(20, 33, 61, 0.12);
+        }
+
+        .a11y-btn {
+            border: 1px solid var(--borda);
+            background: var(--azul-claro);
+            color: var(--azul);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .a11y-btn:hover,
+        .a11y-btn:focus,
+        .a11y-btn[aria-pressed="true"] {
+            background: var(--azul);
+            color: var(--branco);
+            outline: 2px solid var(--azul);
+        }
+
+        /* ================= MODO ALTO CONTRASTE ================= */
+        html.alto-contraste {
+            --fundo: #000000;
+            --azul: #FFD600;
+            --azul-claro: #1A1A1A;
+            --texto: #FFFFFF;
+            --cinza: #E5E7EB;
+            --borda: #FFD600;
+            --verde: #4ADE80;
+            --verde-claro: #1A1A1A;
+            --laranja: #FBBF24;
+            --laranja-claro: #1A1A1A;
+            --vermelho: #F87171;
+            --vermelho-claro: #1A1A1A;
+            --branco: #000000;
+            --card-1: #000000;
+            --card-2: #1A1A1A;
+        }
+
+        html.alto-contraste .btn-primary,
+        html.alto-contraste .balance-box,
+        html.alto-contraste .logo-badge,
+        html.alto-contraste .avatar-circle,
+        html.alto-contraste .a11y-btn[aria-pressed="true"] {
+            background: #FFD600 !important;
+            color: #000000 !important;
+            border-color: #FFD600 !important;
+        }
+
+        html.alto-contraste .balance-box .btn-hide {
+            color: #000000 !important;
+        }
+
+        html.alto-contraste .card-visual {
+            border: 2px solid #FFD600;
         }
 
         /* ================= TELA DE LOGIN ================= */
@@ -148,6 +220,7 @@
             border-radius: 12px;
             border: 1px solid var(--borda);
             background: var(--branco);
+            color: var(--texto);
             font-size: 15px;
             text-align: center;
             outline: none;
@@ -259,7 +332,7 @@
         }
 
         .nav-item:hover {
-            background: #F5F8FF;
+            background: var(--azul-claro);
         }
 
         .nav-item.active {
@@ -293,7 +366,7 @@
 
         .main-content {
             flex: 1;
-            padding: 32px 42px;
+            padding: 48px 42px 32px;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
@@ -421,7 +494,7 @@
         }
 
         .tile:hover {
-            background: #F5F8FF;
+            background: var(--azul-claro);
             transform: translateY(-2px);
         }
 
@@ -524,6 +597,7 @@
             border-radius: 14px;
             border: 1px solid var(--borda);
             background: var(--branco);
+            color: var(--texto);
             margin: 10px 0 14px;
             outline: none;
         }
@@ -592,7 +666,7 @@
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--borda);
-                padding: 16px;
+                padding: 54px 16px 16px;
             }
             .main-content {
                 padding: 20px;
@@ -602,474 +676,579 @@
 </head>
 <body>
 
-    <!-- ================= TELA 1: LOGIN ================= -->
-    <div id="screen-login" class="center-screen">
-        <div class="login-box">
-            <div class="brand-top">SENAI BANK</div>
+<!-- ================= BARRA DE ACESSIBILIDADE ================= -->
+<div class="a11y-bar" role="region" aria-label="Recursos de Acessibilidade">
+    <button type="button" id="btn-audio" class="a11y-btn" aria-pressed="false" onclick="alternarAudio()" title="Ativar ou Desativar Leitura em Áudio (Alt + A)">Áudio: Off</button>
+    <button type="button" id="btn-contraste" class="a11y-btn" aria-pressed="false" onclick="alternarContraste()" title="Alto Contraste (Alt + C)">Alto Contraste</button>
+    <button type="button" class="a11y-btn" onclick="alterarFonte(10)" title="Aumentar Fonte">A+</button>
+    <button type="button" class="a11y-btn" onclick="alterarFonte(-10)" title="Diminuir Fonte">A-</button>
+    <button type="button" class="a11y-btn" onclick="resetarFonte()" title="Tamanho Padrão">100%</button>
+</div>
 
-            <div class="tabs">
-                <button id="btn-tab-0" class="btn btn-primary" onclick="escolherCartao(0)">Cartão 0001</button>
-                <button id="btn-tab-1" class="btn" onclick="escolherCartao(1)">Cartão 0002</button>
-            </div>
+<!-- ================= TELA 1: LOGIN ================= -->
+<div id="screen-login" class="center-screen">
+    <div class="login-box">
+        <div class="brand-top">S-BANK</div>
 
-            <div class="card-visual">
-                <div class="card-brand">S-BANK</div>
-                <div class="card-type">Cartão SBank</div>
-                <div id="login-card-num" class="card-num">•••• •••• •••• 0001</div>
-            </div>
+        <div class="tabs">
+            <button id="btn-tab-0" class="btn btn-primary" onclick="escolherCartao(0)">Cartão 0001</button>
+            <button id="btn-tab-1" class="btn" onclick="escolherCartao(1)">Cartão 0002</button>
+        </div>
 
-            <div class="label-small">Nome de usuário (opcional)</div>
-            <input type="text" id="input-nome" class="input-field" placeholder="Digite seu nome">
+        <div class="card-visual">
+            <div class="card-brand">S-BANK</div>
+            <div class="card-type">Cartão S-Bank</div>
+            <div id="login-card-num" class="card-num">•••• •••• •••• 0001</div>
+        </div>
 
-            <div class="pin-title">Digite sua senha de 4 dígitos</div>
-            <div id="lbl-tentativa" class="label-small">Tentativa 1 de 3</div>
-            <div id="lbl-pontos" class="pin-dots">○ ○ ○ ○</div>
-            <div id="lbl-erro-login" class="error-msg"></div>
+        <div class="label-small">Nome de usuário (opcional)</div>
+        <input type="text" id="input-nome" class="input-field" placeholder="Digite seu nome">
 
-            <div class="keypad">
-                <button class="btn" onclick="digitar('1')">1</button>
-                <button class="btn" onclick="digitar('2')">2</button>
-                <button class="btn" onclick="digitar('3')">3</button>
-                <button class="btn" onclick="digitar('4')">4</button>
-                <button class="btn" onclick="digitar('5')">5</button>
-                <button class="btn" onclick="digitar('6')">6</button>
-                <button class="btn" onclick="digitar('7')">7</button>
-                <button class="btn" onclick="digitar('8')">8</button>
-                <button class="btn" onclick="digitar('9')">9</button>
-                <div></div>
-                <button class="btn" onclick="digitar('0')">0</button>
-                <button class="btn" onclick="digitar('←')">←</button>
-            </div>
+        <div class="pin-title">Digite sua senha de 4 dígitos</div>
+        <div id="lbl-tentativa" class="label-small">Tentativa 1 de 3</div>
+        <div id="lbl-pontos" class="pin-dots">○ ○ ○ ○</div>
+        <div id="lbl-erro-login" class="error-msg"></div>
+
+        <div class="keypad">
+            <button class="btn" onclick="digitar('1')">1</button>
+            <button class="btn" onclick="digitar('2')">2</button>
+            <button class="btn" onclick="digitar('3')">3</button>
+            <button class="btn" onclick="digitar('4')">4</button>
+            <button class="btn" onclick="digitar('5')">5</button>
+            <button class="btn" onclick="digitar('6')">6</button>
+            <button class="btn" onclick="digitar('7')">7</button>
+            <button class="btn" onclick="digitar('8')">8</button>
+            <button class="btn" onclick="digitar('9')">9</button>
+            <div></div>
+            <button class="btn" onclick="digitar('0')">0</button>
+            <button class="btn" aria-label="Apagar dígito" onclick="digitar('←')">←</button>
         </div>
     </div>
+</div>
 
-    <!-- ================= TELA 6: BLOQUEIO ================= -->
-    <div id="screen-bloq" class="center-screen hidden">
-        <div class="login-box">
-            <div class="brand-top">S-BANK</div>
-            <div class="status-circle" style="background: var(--vermelho); margin-top: 20px;">!</div>
-            <h2 style="margin-bottom: 8px;">Acesso negado</h2>
-            <div class="error-msg" style="margin-bottom: 24px;">Tentativas esgotadas. Atendimento encerrado.</div>
-            <button class="btn btn-primary full-btn" onclick="reiniciarLogin()">Reiniciar</button>
+<!-- ================= TELA 6: BLOQUEIO ================= -->
+<div id="screen-bloq" class="center-screen hidden">
+    <div class="login-box">
+        <div class="brand-top">S-BANK</div>
+        <div class="status-circle" style="background: var(--vermelho); margin-top: 20px;">!</div>
+        <h2 style="margin-bottom: 8px;">Acesso negado</h2>
+        <div class="error-msg" style="margin-bottom: 24px;">Tentativas esgotadas. Atendimento encerrado.</div>
+        <button class="btn btn-primary full-btn" onclick="reiniciarLogin()">Reiniciar</button>
+    </div>
+</div>
+
+<!-- ================= APP PRINCIPAL (SIDEBAR + CONTEÚDO) ================= -->
+<div id="screen-app" class="app-layout hidden">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-badge">S</div>
+            <div class="logo-text">S-BANK</div>
         </div>
+
+        <div class="menu-label">MENU</div>
+        <button id="nav-inicio" class="nav-item active" onclick="abrirMenu('')">Início</button>
+        <button id="nav-saldo" class="nav-item" onclick="consultarSaldo()">Consultar saldo</button>
+        <button id="nav-deposito" class="nav-item" onclick="abrirOperacao(false, '')">Depósito</button>
+        <button id="nav-saque" class="nav-item" onclick="abrirOperacao(true, '')">Saque</button>
+        <button id="nav-hist" class="nav-item" onclick="abrirHistorico()">Movimentações</button>
+
+        <div class="sidebar-footer">
+            <div id="lbl-perfil-nome" class="profile-name">Cliente</div>
+            <div id="lbl-perfil-cartao" class="profile-card">Cartão 0001</div>
+            <button class="btn btn-logout" onclick="encerrar()">Encerrar</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <!-- SUBTELA: INÍCIO -->
+        <div id="view-menu">
+            <div class="dash-header">
+                <div>
+                    <div class="dash-subtitle">Bem-vindo(a) ao seu painel</div>
+                    <h1 id="lbl-ola" class="dash-title">Olá, Cliente</h1>
+
+                    <div class="balance-box">
+                        <div class="balance-top">
+                            <span id="lbl-saldo-titulo">Saldo disponível · Cartão 0001</span>
+                            <button id="btn-ocultar" class="btn-hide" onclick="alternarSaldo()">Ocultar</button>
+                        </div>
+                        <div id="lbl-saldo-menu" class="balance-value">R$ 1.000,00</div>
+                    </div>
+                    <div id="lbl-msg-menu" class="success-banner"></div>
+                </div>
+
+                <div class="dash-right">
+                    <div id="lbl-avatar" class="avatar-circle">C</div>
+                    <div class="card-visual">
+                        <div class="card-brand">S-BANK</div>
+                        <div class="card-type">Cartão S-Bank</div>
+                        <div id="home-card-num" class="card-num">•••• •••• •••• 0001</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider">
+            <h3 class="section-title">Operações essenciais</h3>
+
+            <div class="tiles-grid">
+                <div class="tile" onclick="consultarSaldo()">
+                    <div class="tile-icon" style="background: var(--azul-claro); color: var(--azul);">💳</div>
+                    <div class="tile-info">
+                        <h4>Consultar saldo</h4>
+                        <p>Veja quanto tem agora</p>
+                    </div>
+                    <span class="tile-arrow">›</span>
+                </div>
+
+                <div class="tile" onclick="abrirOperacao(false, '')">
+                    <div class="tile-icon" style="background: var(--verde-claro); color: var(--verde);">↓</div>
+                    <div class="tile-info">
+                        <h4>Depósito</h4>
+                        <p>Adicione dinheiro</p>
+                    </div>
+                    <span class="tile-arrow">›</span>
+                </div>
+
+                <div class="tile" onclick="abrirOperacao(true, '')">
+                    <div class="tile-icon" style="background: var(--laranja-claro); color: var(--laranja);">↑</div>
+                    <div class="tile-info">
+                        <h4>Sacar dinheiro</h4>
+                        <p>Retire valores</p>
+                    </div>
+                    <span class="tile-arrow">›</span>
+                </div>
+
+                <div class="tile" onclick="encerrar()">
+                    <div class="tile-icon" style="background: var(--vermelho-claro); color: var(--vermelho);">⏻</div>
+                    <div class="tile-info">
+                        <h4>Encerrar</h4>
+                        <p>Finalizar sessão</p>
+                    </div>
+                    <span class="tile-arrow">›</span>
+                </div>
+            </div>
+
+            <div class="history-header">
+                <h3 class="section-title" style="margin-bottom: 0;">Últimas movimentações</h3>
+                <button class="link-btn" onclick="abrirHistorico()">Ver extrato completo ›</button>
+            </div>
+
+            <div class="history-card">
+                <ul id="lista-mov-home" class="history-list">
+                    <li style="color: var(--cinza);">Nenhuma movimentação registrada neste cartão até o momento.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SUBTELA: SAQUE / DEPÓSITO -->
+        <div id="view-valor" class="inner-center hidden">
+            <div class="op-box">
+                <div class="tabs">
+                    <button id="tab-op-saque" class="btn btn-primary" onclick="abrirOperacao(true, '')">Saque</button>
+                    <button id="tab-op-deposito" class="btn" onclick="abrirOperacao(false, '')">Depósito</button>
+                </div>
+
+                <div id="lbl-saldo-op" class="label-small">Saldo disponível: R$ 1.000,00</div>
+                <div id="lbl-titulo-valor" class="pin-title">Valor do saque (R$)</div>
+
+                <input type="text" id="txt-valor" class="amount-input" placeholder="0,00" onkeydown="if(event.key==='Enter') confirmarOperacao()">
+
+                <div class="chips">
+                    <button class="btn btn-light-blue" onclick="setValor('50')">50</button>
+                    <button class="btn btn-light-blue" onclick="setValor('100')">100</button>
+                    <button class="btn btn-light-blue" onclick="setValor('200')">200</button>
+                    <button class="btn btn-light-blue" onclick="setValor('500')">500</button>
+                </div>
+
+                <div id="lbl-erro-op" class="error-msg"></div>
+
+                <button id="btn-confirmar-op" class="btn btn-primary full-btn" onclick="confirmarOperacao()">Confirmar saque</button>
+                <button class="btn full-btn" onclick="abrirMenu('')">Cancelar operação</button>
+            </div>
+        </div>
+
+        <!-- SUBTELA: CONFIRMAÇÃO DE SAQUE -->
+        <div id="view-conf" class="inner-center hidden">
+            <div class="op-box">
+                <div class="status-circle" style="background: var(--verde);">✓</div>
+                <h2>Transação concluída!</h2>
+
+                <div class="summary-card">
+                    <div class="summary-row">
+                        <span style="color: var(--cinza);">Saque</span>
+                        <strong id="lbl-conf-saque">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span style="color: var(--cinza);">Saldo atual</span>
+                        <strong id="lbl-conf-saldo">R$ 0,00</strong>
+                    </div>
+                </div>
+
+                <div class="label-small" style="margin-bottom: 12px;">Deseja imprimir o comprovante?</div>
+                <button class="btn btn-primary full-btn" onclick="gerarComprovante()">Gerar comprovante (.txt)</button>
+                <button class="btn full-btn" onclick="abrirMenu('Saque concluído, sem comprovante.')">Concluir sem comprovante</button>
+            </div>
+        </div>
+
+        <!-- SUBTELA: COMPROVANTE -->
+        <div id="view-recibo" class="inner-center hidden">
+            <div class="op-box">
+                <div class="status-circle" style="background: var(--verde);">✓</div>
+                <h2>Comprovante gerado</h2>
+
+                <div id="area-recibo" class="receipt-box"></div>
+                <div class="label-small" style="margin-bottom: 16px;">Arquivo salvo: comprovante_sbank.txt</div>
+
+                <button class="btn btn-primary full-btn" onclick="abrirMenu('')">Voltar ao painel</button>
+            </div>
+        </div>
+
+        <!-- SUBTELA: EXTRATO COMPLETO -->
+        <div id="view-historico" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1 style="font-size: 26px;">Extrato de Movimentações</h1>
+                <button class="btn btn-light-blue" onclick="abrirMenu('')">← Voltar ao início</button>
+            </div>
+
+            <div class="history-card">
+                <ul id="lista-mov-completa" class="history-list">
+                    <li style="color: var(--cinza);">Nenhuma movimentação registrada neste cartão até o momento.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ================= WIDGET OFICIAL VLIBRAS (LIBRAS 3D) ================= -->
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
     </div>
+</div>
+<script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+<script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+</script>
 
-    <!-- ================= APP PRINCIPAL (SIDEBAR + CONTEÚDO) ================= -->
-    <div id="screen-app" class="app-layout hidden">
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-badge">S</div>
-                <div class="logo-text">SENAI BANK</div>
-            </div>
+<script>
+    // ================= ACESSIBILIDADE (ÁUDIO PRIVADO, CONTRASTE E FONTE) =================
+    let escalaFonte = 100;
+    let audioAtivo = false;
 
-            <div class="menu-label">MENU</div>
-            <button id="nav-inicio" class="nav-item active" onclick="abrirMenu('')">Início</button>
-            <button id="nav-saldo" class="nav-item" onclick="consultarSaldo()">Consultar saldo</button>
-            <button id="nav-deposito" class="nav-item" onclick="abrirOperacao(false, '')">Depósito</button>
-            <button id="nav-saque" class="nav-item" onclick="abrirOperacao(true, '')">Saque</button>
-            <button id="nav-hist" class="nav-item" onclick="abrirHistorico()">Movimentações</button>
+    function falar(texto, forcar = false) {
+        if ((!audioAtivo && !forcar) || !("speechSynthesis" in window)) return;
+        window.speechSynthesis.cancel();
+        const fala = new SpeechSynthesisUtterance(texto);
+        fala.lang = "pt-BR";
+        fala.rate = 1.05;
+        window.speechSynthesis.speak(fala);
+    }
 
-            <div class="sidebar-footer">
-                <div id="lbl-perfil-nome" class="profile-name">Cliente</div>
-                <div id="lbl-perfil-cartao" class="profile-card">Cartão 0001</div>
-                <button class="btn btn-logout" onclick="encerrar()">Encerrar</button>
-            </div>
-        </aside>
+    function alternarAudio() {
+        audioAtivo = !audioAtivo;
+        const btn = document.getElementById("btn-audio");
+        btn.setAttribute("aria-pressed", String(audioAtivo));
+        btn.textContent = audioAtivo ? "Áudio: On" : "Áudio: Off";
 
-        <main class="main-content">
-            <!-- SUBTELA: INÍCIO -->
-            <div id="view-menu">
-                <div class="dash-header">
-                    <div>
-                        <div class="dash-subtitle">Bem-vindo(a) ao seu painel</div>
-                        <h1 id="lbl-ola" class="dash-title">Olá, Cliente</h1>
-
-                        <div class="balance-box">
-                            <div class="balance-top">
-                                <span id="lbl-saldo-titulo">Saldo disponível · Cartão 0001</span>
-                                <button id="btn-ocultar" class="btn-hide" onclick="alternarSaldo()">Ocultar</button>
-                            </div>
-                            <div id="lbl-saldo-menu" class="balance-value">R$ 1.000,00</div>
-                        </div>
-                        <div id="lbl-msg-menu" class="success-banner"></div>
-                    </div>
-
-                    <div class="dash-right">
-                        <div id="lbl-avatar" class="avatar-circle">C</div>
-                        <div class="card-visual">
-                            <div class="card-brand">S-BANK</div>
-                            <div class="card-type">Cartão SBank</div>
-                            <div id="home-card-num" class="card-num">•••• •••• •••• 0001</div>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="divider">
-                <h3 class="section-title">Operações essenciais</h3>
-
-                <div class="tiles-grid">
-                    <div class="tile" onclick="consultarSaldo()">
-                        <div class="tile-icon" style="background: var(--azul-claro); color: var(--azul);">💳</div>
-                        <div class="tile-info">
-                            <h4>Consultar saldo</h4>
-                            <p>Veja quanto tem agora</p>
-                        </div>
-                        <span class="tile-arrow">›</span>
-                    </div>
-
-                    <div class="tile" onclick="abrirOperacao(false, '')">
-                        <div class="tile-icon" style="background: var(--verde-claro); color: var(--verde);">↓</div>
-                        <div class="tile-info">
-                            <h4>Depósito</h4>
-                            <p>Adicione dinheiro</p>
-                        </div>
-                        <span class="tile-arrow">›</span>
-                    </div>
-
-                    <div class="tile" onclick="abrirOperacao(true, '')">
-                        <div class="tile-icon" style="background: var(--laranja-claro); color: var(--laranja);">↑</div>
-                        <div class="tile-info">
-                            <h4>Sacar dinheiro</h4>
-                            <p>Retire valores</p>
-                        </div>
-                        <span class="tile-arrow">›</span>
-                    </div>
-
-                    <div class="tile" onclick="encerrar()">
-                        <div class="tile-icon" style="background: var(--vermelho-claro); color: var(--vermelho);">⏻</div>
-                        <div class="tile-info">
-                            <h4>Encerrar</h4>
-                            <p>Finalizar sessão</p>
-                        </div>
-                        <span class="tile-arrow">›</span>
-                    </div>
-                </div>
-
-                <div class="history-header">
-                    <h3 class="section-title" style="margin-bottom: 0;">Últimas movimentações</h3>
-                    <button class="link-btn" onclick="abrirHistorico()">Ver extrato completo ›</button>
-                </div>
-
-                <div class="history-card">
-                    <ul id="lista-mov-home" class="history-list">
-                        <li style="color: var(--cinza);">Nenhuma movimentação registrada neste cartão até o momento.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- SUBTELA: SAQUE / DEPÓSITO -->
-            <div id="view-valor" class="inner-center hidden">
-                <div class="op-box">
-                    <div class="tabs">
-                        <button id="tab-op-saque" class="btn btn-primary" onclick="abrirOperacao(true, '')">Saque</button>
-                        <button id="tab-op-deposito" class="btn" onclick="abrirOperacao(false, '')">Depósito</button>
-                    </div>
-
-                    <div id="lbl-saldo-op" class="label-small">Saldo disponível: R$ 1.000,00</div>
-                    <div id="lbl-titulo-valor" class="pin-title">Valor do saque (R$)</div>
-
-                    <input type="text" id="txt-valor" class="amount-input" placeholder="0,00" onkeydown="if(event.key==='Enter') confirmarOperacao()">
-
-                    <div class="chips">
-                        <button class="btn btn-light-blue" onclick="setValor('50')">50</button>
-                        <button class="btn btn-light-blue" onclick="setValor('100')">100</button>
-                        <button class="btn btn-light-blue" onclick="setValor('200')">200</button>
-                        <button class="btn btn-light-blue" onclick="setValor('500')">500</button>
-                    </div>
-
-                    <div id="lbl-erro-op" class="error-msg"></div>
-
-                    <button id="btn-confirmar-op" class="btn btn-primary full-btn" onclick="confirmarOperacao()">Confirmar saque</button>
-                    <button class="btn full-btn" onclick="abrirMenu('')">Cancelar operação</button>
-                </div>
-            </div>
-
-            <!-- SUBTELA: CONFIRMAÇÃO DE SAQUE -->
-            <div id="view-conf" class="inner-center hidden">
-                <div class="op-box">
-                    <div class="status-circle" style="background: var(--verde);">✓</div>
-                    <h2>Transação concluída!</h2>
-
-                    <div class="summary-card">
-                        <div class="summary-row">
-                            <span style="color: var(--cinza);">Saque</span>
-                            <strong id="lbl-conf-saque">R$ 0,00</strong>
-                        </div>
-                        <div class="summary-row">
-                            <span style="color: var(--cinza);">Saldo atual</span>
-                            <strong id="lbl-conf-saldo">R$ 0,00</strong>
-                        </div>
-                    </div>
-
-                    <div class="label-small" style="margin-bottom: 12px;">Deseja imprimir o comprovante?</div>
-                    <button class="btn btn-primary full-btn" onclick="gerarComprovante()">Gerar comprovante (.txt)</button>
-                    <button class="btn full-btn" onclick="abrirMenu('Saque concluído, sem comprovante.')">Concluir sem comprovante</button>
-                </div>
-            </div>
-
-            <!-- SUBTELA: COMPROVANTE -->
-            <div id="view-recibo" class="inner-center hidden">
-                <div class="op-box">
-                    <div class="status-circle" style="background: var(--verde);">✓</div>
-                    <h2>Comprovante gerado</h2>
-
-                    <div id="area-recibo" class="receipt-box"></div>
-                    <div class="label-small" style="margin-bottom: 16px;">Arquivo salvo: comprovante_senai_bank.txt</div>
-
-                    <button class="btn btn-primary full-btn" onclick="abrirMenu('')">Voltar ao painel</button>
-                </div>
-            </div>
-
-            <!-- SUBTELA: EXTRATO COMPLETO -->
-            <div id="view-historico" class="hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h1 style="font-size: 26px;">Extrato de Movimentações</h1>
-                    <button class="btn btn-light-blue" onclick="abrirMenu('')">← Voltar ao início</button>
-                </div>
-
-                <div class="history-card">
-                    <ul id="lista-mov-completa" class="history-list">
-                        <li style="color: var(--cinza);">Nenhuma movimentação registrada neste cartão até o momento.</li>
-                    </ul>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // ================= ESTADO E DADOS DO BANCO =================
-        const numeros = ["0001", "0002"];
-        const NOME_CARTAO = "Cartão SBank";
-        const senhas = ["1234", "0000"];
-        let saldos = [1000.0, 200.0];
-        let movimentacoes = [];
-
-        let c = 0;
-        let tentativa = 1;
-        let pin = "";
-        let modoSaque = true;
-        let ultimoSaque = 0;
-        let usuario = "Cliente";
-        let ocultarSaldo = false;
-
-        function reais(valor) {
-            return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        if (audioAtivo) {
+            falar("Leitura em áudio ativada. Por privacidade, valores e saldos não são falados em voz alta.", true);
+        } else {
+            window.speechSynthesis.cancel();
         }
+    }
 
-        function dataHoraAtual() {
-            const agora = new Date();
-            return agora.toLocaleDateString("pt-BR") + " " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    document.addEventListener("mouseover", function (e) {
+        if (!audioAtivo) return;
+        const alvo = e.target.closest("button, .tile, input");
+        if (!alvo) return;
+        const texto = alvo.getAttribute("aria-label") || alvo.getAttribute("placeholder") || alvo.innerText;
+        if (texto && texto.trim()) {
+            falar(texto.trim());
         }
+    });
 
-        // ================= LÓGICA DE LOGIN =================
-        function escolherCartao(i) {
-            c = i;
-            tentativa = 1;
-            pin = "";
-            document.getElementById("lbl-erro-login").textContent = "";
-            atualizarLogin();
+    function alternarContraste() {
+        const ativo = document.documentElement.classList.toggle("alto-contraste");
+        document.getElementById("btn-contraste").setAttribute("aria-pressed", String(ativo));
+        falar(ativo ? "Modo alto contraste ativado" : "Modo alto contraste desativado");
+    }
+
+    function alterarFonte(delta) {
+        const novaEscala = escalaFonte + delta;
+        if (novaEscala >= 90 && novaEscala <= 130) {
+            escalaFonte = novaEscala;
+            document.body.style.zoom = (escalaFonte / 100);
+            falar(`Tamanho da fonte em ${escalaFonte} por cento`);
         }
+    }
 
-        function atualizarLogin() {
-            document.getElementById("btn-tab-0").className = c === 0 ? "btn btn-primary" : "btn";
-            document.getElementById("btn-tab-1").className = c === 1 ? "btn btn-primary" : "btn";
-            document.getElementById("login-card-num").textContent = "•••• •••• •••• " + numeros[c];
+    function resetarFonte() {
+        escalaFonte = 100;
+        document.body.style.zoom = 1;
+        falar("Tamanho da fonte restaurado para 100 por cento");
+    }
 
-            document.getElementById("lbl-tentativa").textContent = `Tentativa ${tentativa} de 3`;
-            const n = pin.length;
-            document.getElementById("lbl-pontos").textContent = "● ".repeat(n) + "○ ".repeat(4 - n);
+    document.addEventListener("keydown", function (e) {
+        if (e.altKey && (e.key === "c" || e.key === "C")) {
+            e.preventDefault();
+            alternarContraste();
         }
+        if (e.altKey && (e.key === "a" || e.key === "A")) {
+            e.preventDefault();
+            alternarAudio();
+        }
+    });
 
-        function digitar(t) {
-            if (t === "←") {
-                pin = pin.slice(0, -1);
-            } else if (pin.length < 4) {
-                pin += t;
-            }
-            atualizarLogin();
+    // ================= ESTADO E DADOS DO BANCO =================
+    const numeros = ["0001", "0002"];
+    const NOME_CARTAO = "Cartão S-Bank";
+    const senhas = ["1234", "0000"];
+    let saldos = [1000.0, 350.0];
+    let movimentacoes = [];
 
-            if (pin.length === 4) {
-                if (pin === senhas[c]) {
-                    let nomeDigitado = document.getElementById("input-nome").value.trim();
-                    usuario = nomeDigitado ? nomeDigitado.slice(0, 18) : "Cliente";
-                    pin = "";
-                    document.getElementById("lbl-erro-login").textContent = "";
-                    abrirMenu("");
+    let c = 0;
+    let tentativa = 1;
+    let pin = "";
+    let modoSaque = true;
+    let ultimoSaque = 0;
+    let usuario = "Cliente";
+    let ocultarSaldo = false;
+
+    function reais(valor) {
+        return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function dataHoraAtual() {
+        const agora = new Date();
+        return agora.toLocaleDateString("pt-BR") + " " + agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    // ================= LÓGICA DE LOGIN =================
+    function escolherCartao(i) {
+        c = i;
+        tentativa = 1;
+        pin = "";
+        document.getElementById("lbl-erro-login").textContent = "";
+        atualizarLogin();
+        falar(`Cartão ${numeros[c]} selecionado`);
+    }
+
+    function atualizarLogin() {
+        document.getElementById("btn-tab-0").className = c === 0 ? "btn btn-primary" : "btn";
+        document.getElementById("btn-tab-1").className = c === 1 ? "btn btn-primary" : "btn";
+        document.getElementById("login-card-num").textContent = "•••• •••• •••• " + numeros[c];
+
+        document.getElementById("lbl-tentativa").textContent = `Tentativa ${tentativa} de 3`;
+        const n = pin.length;
+        document.getElementById("lbl-pontos").textContent = "● ".repeat(n) + "○ ".repeat(4 - n);
+    }
+
+    function digitar(t) {
+        if (t === "←") {
+            pin = pin.slice(0, -1);
+        } else if (pin.length < 4) {
+            pin += t;
+        }
+        atualizarLogin();
+
+        if (pin.length === 4) {
+            if (pin === senhas[c]) {
+                let nomeDigitado = document.getElementById("input-nome").value.trim();
+                usuario = nomeDigitado ? nomeDigitado.slice(0, 18) : "Cliente";
+                pin = "";
+                document.getElementById("lbl-erro-login").textContent = "";
+                abrirMenu("");
+                falar(`Acesso liberado. Olá, ${usuario}. Painel principal aberto.`);
+            } else {
+                pin = "";
+                tentativa++;
+                if (tentativa > 3) {
+                    mostrarTelaPrincipal("screen-bloq");
+                    falar("Acesso negado. Tentativas esgotadas. Atendimento encerrado.");
                 } else {
-                    pin = "";
-                    tentativa++;
-                    if (tentativa > 3) {
-                        mostrarTelaPrincipal("screen-bloq");
-                    } else {
-                        atualizarLogin();
-                        document.getElementById("lbl-erro-login").textContent = "Senha incorreta!";
-                    }
+                    atualizarLogin();
+                    document.getElementById("lbl-erro-login").textContent = "Senha incorreta!";
+                    falar(`Senha incorreta. Tentativa ${tentativa} de 3.`);
                 }
             }
         }
+    }
 
-        function reiniciarLogin() {
-            document.getElementById("input-nome").value = "";
-            escolherCartao(0);
-            mostrarTelaPrincipal("screen-login");
+    function reiniciarLogin() {
+        document.getElementById("input-nome").value = "";
+        escolherCartao(0);
+        mostrarTelaPrincipal("screen-login");
+    }
+
+    // ================= NAVEGAÇÃO =================
+    function mostrarTelaPrincipal(id) {
+        ["screen-login", "screen-bloq", "screen-app"].forEach(s => {
+            document.getElementById(s).classList.add("hidden");
+        });
+        document.getElementById(id).classList.remove("hidden");
+    }
+
+    function mostrarSubtela(viewId) {
+        mostrarTelaPrincipal("screen-app");
+        ["view-menu", "view-valor", "view-conf", "view-recibo", "view-historico"].forEach(v => {
+            document.getElementById(v).classList.add("hidden");
+        });
+        document.getElementById(viewId).classList.remove("hidden");
+
+        document.getElementById("nav-inicio").classList.toggle("active", viewId === "view-menu");
+        document.getElementById("nav-deposito").classList.toggle("active", viewId === "view-valor" && !modoSaque);
+        document.getElementById("nav-saque").classList.toggle("active", (viewId === "view-valor" && modoSaque) || viewId === "view-conf" || viewId === "view-recibo");
+        document.getElementById("nav-hist").classList.toggle("active", viewId === "view-historico");
+    }
+
+    // ================= DASHBOARD =================
+    function abrirMenu(mensagem) {
+        document.getElementById("lbl-ola").textContent = `Olá, ${usuario}`;
+        document.getElementById("lbl-saldo-titulo").textContent = `Saldo disponível · Cartão ${numeros[c]}`;
+        document.getElementById("lbl-msg-menu").textContent = mensagem;
+        document.getElementById("lbl-avatar").textContent = usuario.charAt(0).toUpperCase();
+        document.getElementById("home-card-num").textContent = "•••• •••• •••• " + numeros[c];
+        document.getElementById("lbl-perfil-nome").textContent = usuario;
+        document.getElementById("lbl-perfil-cartao").textContent = `Cartão ${numeros[c]}`;
+
+        atualizarSaldoTela();
+        renderizarMovimentacoes();
+        mostrarSubtela("view-menu");
+        if (mensagem) falar(mensagem);
+    }
+
+    function alternarSaldo() {
+        ocultarSaldo = !ocultarSaldo;
+        atualizarSaldoTela();
+        falar(ocultarSaldo ? "Saldo ocultado na tela" : "Saldo visível na tela");
+    }
+
+    function atualizarSaldoTela() {
+        document.getElementById("lbl-saldo-menu").textContent = ocultarSaldo ? "R$ ••••••" : reais(saldos[c]);
+        document.getElementById("btn-ocultar").textContent = ocultarSaldo ? "Mostrar" : "Ocultar";
+    }
+
+    function consultarSaldo() {
+        falar("Consulta de saldo exibida na tela.");
+        alert(`Seu saldo é: ${reais(saldos[c])}`);
+    }
+
+    function encerrar() {
+        const msg = `${usuario}, atendimento encerrado com sucesso!`;
+        falar("Atendimento encerrado com sucesso.");
+        alert(msg);
+        reiniciarLogin();
+    }
+
+    // ================= OPERAÇÕES (SAQUE / DEPÓSITO) =================
+    function abrirOperacao(saque, valorInicial) {
+        modoSaque = saque;
+        document.getElementById("txt-valor").value = valorInicial;
+        document.getElementById("lbl-erro-op").textContent = "";
+
+        document.getElementById("tab-op-saque").className = saque ? "btn btn-primary" : "btn";
+        document.getElementById("tab-op-deposito").className = !saque ? "btn btn-primary" : "btn";
+
+        document.getElementById("lbl-saldo-op").textContent = `Saldo disponível: ${reais(saldos[c])}`;
+        document.getElementById("lbl-titulo-valor").textContent = saque ? "Valor do saque (R$)" : "Valor do depósito (R$)";
+        document.getElementById("btn-confirmar-op").textContent = saque ? "Confirmar saque" : "Confirmar depósito";
+
+        mostrarSubtela("view-valor");
+        document.getElementById("txt-valor").focus();
+        falar(saque ? "Tela de saque. Informe o valor." : "Tela de depósito. Informe o valor.");
+    }
+
+    function setValor(v) {
+        document.getElementById("txt-valor").value = v;
+        falar("Valor selecionado.");
+    }
+
+    function confirmarOperacao() {
+        const texto = document.getElementById("txt-valor").value.trim().replace(",", ".");
+        const valor = parseFloat(texto);
+
+        if (isNaN(valor) || valor <= 0) {
+            document.getElementById("lbl-erro-op").textContent = "Erro: Valor inválido.";
+            falar("Erro: Valor inválido.");
+            return;
         }
 
-        // ================= NAVEGAÇÃO =================
-        function mostrarTelaPrincipal(id) {
-            ["screen-login", "screen-bloq", "screen-app"].forEach(s => {
-                document.getElementById(s).classList.add("hidden");
-            });
-            document.getElementById(id).classList.remove("hidden");
-        }
-
-        function mostrarSubtela(viewId) {
-            mostrarTelaPrincipal("screen-app");
-            ["view-menu", "view-valor", "view-conf", "view-recibo", "view-historico"].forEach(v => {
-                document.getElementById(v).classList.add("hidden");
-            });
-            document.getElementById(viewId).classList.remove("hidden");
-
-            document.getElementById("nav-inicio").classList.toggle("active", viewId === "view-menu");
-            document.getElementById("nav-deposito").classList.toggle("active", viewId === "view-valor" && !modoSaque);
-            document.getElementById("nav-saque").classList.toggle("active", (viewId === "view-valor" && modoSaque) || viewId === "view-conf" || viewId === "view-recibo");
-            document.getElementById("nav-hist").classList.toggle("active", viewId === "view-historico");
-        }
-
-        // ================= DASHBOARD =================
-        function abrirMenu(mensagem) {
-            document.getElementById("lbl-ola").textContent = `Olá, ${usuario}`;
-            document.getElementById("lbl-saldo-titulo").textContent = `Saldo disponível · Cartão ${numeros[c]}`;
-            document.getElementById("lbl-msg-menu").textContent = mensagem;
-            document.getElementById("lbl-avatar").textContent = usuario.charAt(0).toUpperCase();
-            document.getElementById("home-card-num").textContent = "•••• •••• •••• " + numeros[c];
-            document.getElementById("lbl-perfil-nome").textContent = usuario;
-            document.getElementById("lbl-perfil-cartao").textContent = `Cartão ${numeros[c]}`;
-
-            atualizarSaldoTela();
-            renderizarMovimentacoes();
-            mostrarSubtela("view-menu");
-        }
-
-        function alternarSaldo() {
-            ocultarSaldo = !ocultarSaldo;
-            atualizarSaldoTela();
-        }
-
-        function atualizarSaldoTela() {
-            document.getElementById("lbl-saldo-menu").textContent = ocultarSaldo ? "R$ ••••••" : reais(saldos[c]);
-            document.getElementById("btn-ocultar").textContent = ocultarSaldo ? "Mostrar" : "Ocultar";
-        }
-
-        function consultarSaldo() {
-            alert(`Seu saldo é: ${reais(saldos[c])}`);
-        }
-
-        function encerrar() {
-            alert(`${usuario}, atendimento encerrado com sucesso!`);
-            reiniciarLogin();
-        }
-
-        // ================= OPERAÇÕES (SAQUE / DEPÓSITO) =================
-        function abrirOperacao(saque, valorInicial) {
-            modoSaque = saque;
-            document.getElementById("txt-valor").value = valorInicial;
-            document.getElementById("lbl-erro-op").textContent = "";
-
-            document.getElementById("tab-op-saque").className = saque ? "btn btn-primary" : "btn";
-            document.getElementById("tab-op-deposito").className = !saque ? "btn btn-primary" : "btn";
-
-            document.getElementById("lbl-saldo-op").textContent = `Saldo disponível: ${reais(saldos[c])}`;
-            document.getElementById("lbl-titulo-valor").textContent = saque ? "Valor do saque (R$)" : "Valor do depósito (R$)";
-            document.getElementById("btn-confirmar-op").textContent = saque ? "Confirmar saque" : "Confirmar depósito";
-
-            mostrarSubtela("view-valor");
-            document.getElementById("txt-valor").focus();
-        }
-
-        function setValor(v) {
-            document.getElementById("txt-valor").value = v;
-        }
-
-        function confirmarOperacao() {
-            const texto = document.getElementById("txt-valor").value.trim().replace(",", ".");
-            const valor = parseFloat(texto);
-
-            if (isNaN(valor) || valor <= 0) {
-                document.getElementById("lbl-erro-op").textContent = "Erro: Valor inválido.";
+        if (modoSaque) {
+            if (valor > saldos[c]) {
+                document.getElementById("lbl-erro-op").textContent = "Erro: Saldo insuficiente.";
+                falar("Erro: Saldo insuficiente.");
                 return;
             }
+            saldos[c] -= valor;
+            ultimoSaque = valor;
+            movimentacoes.unshift({ cartao: c, tipo: "Saque", valor: valor, data: dataHoraAtual() });
 
-            if (modoSaque) {
-                if (valor > saldos[c]) {
-                    document.getElementById("lbl-erro-op").textContent = "Erro: Saldo insuficiente.";
-                    return;
-                }
-                saldos[c] -= valor;
-                ultimoSaque = valor;
-                movimentacoes.unshift({ cartao: c, tipo: "Saque", valor: valor, data: dataHoraAtual() });
-
-                document.getElementById("lbl-conf-saque").textContent = reais(valor);
-                document.getElementById("lbl-conf-saldo").textContent = reais(saldos[c]);
-                mostrarSubtela("view-conf");
-            } else {
-                saldos[c] += valor;
-                movimentacoes.unshift({ cartao: c, tipo: "Depósito", valor: valor, data: dataHoraAtual() });
-                abrirMenu("Depósito realizado com sucesso!");
-            }
+            document.getElementById("lbl-conf-saque").textContent = reais(valor);
+            document.getElementById("lbl-conf-saldo").textContent = reais(saldos[c]);
+            mostrarSubtela("view-conf");
+            falar("Saque concluído com sucesso. Deseja gerar o comprovante?");
+        } else {
+            saldos[c] += valor;
+            movimentacoes.unshift({ cartao: c, tipo: "Depósito", valor: valor, data: dataHoraAtual() });
+            abrirMenu("Depósito realizado com sucesso!");
         }
+    }
 
-        // ================= COMPROVANTE E HISTÓRICO =================
-        function gerarComprovante() {
-            const conteudo =
-`SENAI BANK - COMPROVANTE
+    // ================= COMPROVANTE E HISTÓRICO =================
+    function gerarComprovante() {
+        const conteudo =
+            `S-BANK - COMPROVANTE
 Cliente: ${usuario}
 Cartão: ${numeros[c]}
 Saque: ${reais(ultimoSaque)}
 Saldo atual: ${reais(saldos[c])}`;
 
-            document.getElementById("area-recibo").textContent = conteudo;
+        document.getElementById("area-recibo").textContent = conteudo;
 
-            const blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "comprovante_senai_bank.txt";
-            link.click();
+        const blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "comprovante_sbank.txt";
+        link.click();
 
-            mostrarSubtela("view-recibo");
+        mostrarSubtela("view-recibo");
+        falar("Comprovante gerado e salvo com sucesso.");
+    }
+
+    function abrirHistorico() {
+        renderizarMovimentacoes();
+        mostrarSubtela("view-historico");
+        falar("Extrato de movimentações");
+    }
+
+    function renderizarMovimentacoes() {
+        const filtradas = movimentacoes.filter(m => m.cartao === c);
+        const listaHome = document.getElementById("lista-mov-home");
+        const listaCompleta = document.getElementById("lista-mov-completa");
+
+        if (filtradas.length === 0) {
+            const vazio = `<li style="color: var(--cinza);">Nenhuma movimentação registrada neste cartão até o momento.</li>`;
+            listaHome.innerHTML = vazio;
+            listaCompleta.innerHTML = vazio;
+            return;
         }
 
-        function abrirHistorico() {
-            renderizarMovimentacoes();
-            mostrarSubtela("view-historico");
-        }
-
-        function renderizarMovimentacoes() {
-            const filtradas = movimentacoes.filter(m => m.cartao === c);
-            const listaHome = document.getElementById("lista-mov-home");
-            const listaCompleta = document.getElementById("lista-mov-completa");
-
-            if (filtradas.length === 0) {
-                const vazio = `<li style="color: var(--cinza);">Nenhuma movimentação registrada neste cartão até o momento.</li>`;
-                listaHome.innerHTML = vazio;
-                listaCompleta.innerHTML = vazio;
-                return;
-            }
-
-            const gerarHtmlItem = (m) => {
-                const isDep = m.tipo === "Depósito";
-                const classe = isDep ? "text-green" : "text-red";
-                const sinal = isDep ? "+" : "-";
-                return `<li>
+        const gerarHtmlItem = (m) => {
+            const isDep = m.tipo === "Depósito";
+            const classe = isDep ? "text-green" : "text-red";
+            const sinal = isDep ? "+" : "-";
+            return `<li>
                     <span><strong>${m.tipo.toUpperCase()}</strong> · ${m.data}</span>
                     <span class="${classe}">${sinal} ${reais(m.valor)}</span>
                 </li>`;
-            };
+        };
 
-            listaHome.innerHTML = filtradas.slice(0, 6).map(gerarHtmlItem).join("");
-            listaCompleta.innerHTML = filtradas.map(gerarHtmlItem).join("");
-        }
+        listaHome.innerHTML = filtradas.slice(0, 6).map(gerarHtmlItem).join("");
+        listaCompleta.innerHTML = filtradas.map(gerarHtmlItem).join("");
+    }
 
-        atualizarLogin();
-    </script>
+    atualizarLogin();
+</script>
 </body>
 </html>
