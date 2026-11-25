@@ -723,6 +723,12 @@
             <button class="btn" onclick="digitar('0')">0</button>
             <button class="btn" aria-label="Apagar dígito" onclick="digitar('←')">←</button>
         </div>
+
+        <div style="margin-top: 16px;">
+            <a href="./javadoc/" target="_blank" rel="noopener noreferrer" class="link-btn" style="text-decoration: none; font-size: 12px;">
+                📄 Documentação Técnica (Javadoc) ↗
+            </a>
+        </div>
     </div>
 </div>
 
@@ -932,7 +938,7 @@
 </script>
 
 <script>
-    // ================= ACESSIBILIDADE (ÁUDIO PRIVADO, CONTRASTE E FONTE) =================
+    // ================= ACESSIBILIDADE (ÁUDIO, CONTRASTE E FONTE) =================
     let escalaFonte = 100;
     let audioAtivo = false;
 
@@ -952,7 +958,7 @@
         btn.textContent = audioAtivo ? "Áudio: On" : "Áudio: Off";
 
         if (audioAtivo) {
-            falar("Leitura em áudio ativada. Por privacidade, valores e saldos não são falados em voz alta.", true);
+            falar("Leitura em áudio ativada. Passe o cursor ou clique nas opções para ouvir o S-Bank.", true);
         } else {
             window.speechSynthesis.cancel();
         }
@@ -960,7 +966,7 @@
 
     document.addEventListener("mouseover", function (e) {
         if (!audioAtivo) return;
-        const alvo = e.target.closest("button, .tile, input");
+        const alvo = e.target.closest("button, .tile, input, a");
         if (!alvo) return;
         const texto = alvo.getAttribute("aria-label") || alvo.getAttribute("placeholder") || alvo.innerText;
         if (texto && texto.trim()) {
@@ -1059,7 +1065,7 @@
                 pin = "";
                 document.getElementById("lbl-erro-login").textContent = "";
                 abrirMenu("");
-                falar(`Acesso liberado. Olá, ${usuario}. Painel principal aberto.`);
+                falar(`Acesso liberado. Olá, ${usuario}. Saldo disponível: ${reais(saldos[c])}`);
             } else {
                 pin = "";
                 tentativa++;
@@ -1121,7 +1127,7 @@
     function alternarSaldo() {
         ocultarSaldo = !ocultarSaldo;
         atualizarSaldoTela();
-        falar(ocultarSaldo ? "Saldo ocultado na tela" : "Saldo visível na tela");
+        falar(ocultarSaldo ? "Saldo ocultado" : `Saldo disponível: ${reais(saldos[c])}`);
     }
 
     function atualizarSaldoTela() {
@@ -1130,13 +1136,14 @@
     }
 
     function consultarSaldo() {
-        falar("Consulta de saldo exibida na tela.");
-        alert(`Seu saldo é: ${reais(saldos[c])}`);
+        const msg = `Seu saldo é: ${reais(saldos[c])}`;
+        falar(msg);
+        alert(msg);
     }
 
     function encerrar() {
         const msg = `${usuario}, atendimento encerrado com sucesso!`;
-        falar("Atendimento encerrado com sucesso.");
+        falar(msg);
         alert(msg);
         reiniciarLogin();
     }
@@ -1161,7 +1168,7 @@
 
     function setValor(v) {
         document.getElementById("txt-valor").value = v;
-        falar("Valor selecionado.");
+        falar(`${v} reais selecionados`);
     }
 
     function confirmarOperacao() {
@@ -1187,11 +1194,11 @@
             document.getElementById("lbl-conf-saque").textContent = reais(valor);
             document.getElementById("lbl-conf-saldo").textContent = reais(saldos[c]);
             mostrarSubtela("view-conf");
-            falar("Saque concluído com sucesso. Deseja gerar o comprovante?");
+            falar(`Transação concluída. Saque de ${reais(valor)}. Saldo atual: ${reais(saldos[c])}. Deseja imprimir o comprovante?`);
         } else {
             saldos[c] += valor;
             movimentacoes.unshift({ cartao: c, tipo: "Depósito", valor: valor, data: dataHoraAtual() });
-            abrirMenu("Depósito realizado com sucesso!");
+            abrirMenu(`Depósito de ${reais(valor)} realizado com sucesso! Saldo atual: ${reais(saldos[c])}`);
         }
     }
 
