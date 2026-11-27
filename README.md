@@ -69,12 +69,19 @@ Para validação rápida das regras de autenticação, saldo e movimentações, 
 
 ---
 
-## 5. Como Executar
 
-1. Certifique-se de ter o **Java (JDK 8 ou superior)** instalado em sua máquina.
-2. Clone o repositório:
+## 5. Arquitetura e Infraestrutura
+
+### Pré-requisitos
+* **Java Development Kit (JDK):** Versão 8 ou superior instalada.
+* **IDE ou Terminal:** Ambiente para execução de código Java (Eclipse, IntelliJ, VS Code ou Terminal).
+
+### Como Executar o Projeto Localmente
+
+1. **Clone o repositório:**
    ```bash
    git clone [https://github.com/fernandaafaria/S-Bank.git](https://github.com/fernandaafaria/S-Bank.git)
+   cd S-Bank
 
 ## 6. Modelo de Negócio e Visão de Futuro
 
